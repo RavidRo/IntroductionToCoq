@@ -300,11 +300,11 @@ Proof.
 Abort.
 
 
-Lemma completeEven1 : forall x : nat, isEven x = true -> even x.
+Theorem completeEven1 : forall x : nat, isEven x = true -> even x.
 Proof.
 Abort.
 
-Lemma completeEven2 : forall x : nat, even x -> isEven x = true.
+Theorem completeEven2 : forall x : nat, even x -> isEven x = true.
 Proof.
 Abort.
 

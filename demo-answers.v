@@ -409,7 +409,7 @@ apply even0.
 Qed. 
 
 
-Lemma completeEven1 : forall x : nat, isEven x = true -> even x.
+Theorem completeEven1 : forall x : nat, isEven x = true -> even x.
 Proof.
 intro x.
 (* Introducing induction *)
@@ -418,7 +418,7 @@ induction x.
   apply even0.
 Abort.
 
-Lemma completeEven2 : forall x : nat, even x -> isEven x = true.
+Theorem completeEven2 : forall x : nat, even x -> isEven x = true.
 Proof.
 intros x.
 induction x.
