@@ -1,4 +1,4 @@
-From Coq Require Import Arith Bool.
+From Coq Require Import Arith Bool Classical_Prop.
 
 (* Coq is a functional strongly typed programming language *)
 
@@ -15,11 +15,15 @@ Check true.
 Check (false && true).
 Check (5, true).
 
-(* Coq will throw an error if the given expression has different type then the expcted one *)
+(* Coq will throw an error if the given expression has different type thenthe expcted one *)
 Fail Check 5 && 6.
 
 (* Note that this is of type prop(Proposition). If we think that the proposition is indeed true than we need to prove it. *)
 Check 10 = 27.
+
+(* It doesnt ean there you cant write functions that check equality *)
+(* TODO: decide if you should include this or not - SearchPattern (nat -> nat -> bool). *)
+Compute Nat.eqb 1 1.
 
 Compute 20 * 2.
 Compute (false || true).
@@ -409,23 +413,129 @@ apply even0.
 Qed. 
 
 
-Theorem completeEven1 : forall x : nat, isEven x = true -> even x.
+(*
+  Now let's prove a difficult theorem.
+  We will prove that isEven returns true if and only if the number is of the even type.
+  
+  To prove that we will need to prove some additional lemmas.
+*)
+
+Lemma not_not: forall p: Prop, ~~p <-> p.
+Proof.
+intro.
+split.
+(* Here we used a lemma from the standart library *)
+Check NNPP.
+- apply NNPP.
+(* Introducing unfold *)
+- unfold not.
+  intro. 
+  contradiction.
+Qed.
+
+Lemma not_iff: forall p1 p2: Prop, (p1 <-> p2) -> (~p1 <-> ~p2).
+Proof.
+intros.
+rewrite H.
+split; intro H0; apply H0.
+Qed.
+
+(* The predicates only dfines on of the directions. It is up to us to prove the other one.*)
+Lemma odd_iff_next_even : forall n, even (S n) <-> odd n.
+Proof.
+intro.
+split.
+- intro.
+  (* Introducing inversion *)
+  inversion H.
+  apply H1.
+- apply evenS. 
+Qed.
+
+Lemma even_iff_next_odd : forall n, odd (S n) <-> even n.
+Proof.
+intro.
+split.
+- intro.
+  inversion H.
+  apply H1.
+- apply oddS. 
+Qed.
+
+
+(* 
+Now for the 2 important lemmas:
+- The connection between even and odd.
+- The connection between isEven and isOdd.
+*)
+Lemma even_iff_not_odd : forall x: nat, even x <-> ~odd x.
 Proof.
 intro x.
 (* Introducing induction *)
 induction x.
-- intro.
-  apply even0.
-Abort.
+- split.
+  + intro.
+    unfold not.
+    intro H_odd0.
+    inversion H_odd0.
+  + intro. 
+    apply even0.
+- split.
+  + intro.
+    inversion H.
+    intro.
+    inversion H2.
+    apply IHx in H4.
+    contradiction.
+  + rewrite odd_iff_next_even.
+    rewrite even_iff_next_odd.
+    apply not_iff in IHx.
+    rewrite not_not in IHx.
+    apply IHx.
+Qed.
 
-Theorem completeEven2 : forall x : nat, even x -> isEven x = true.
+Lemma isEven_iff_not_isOdd : forall x: nat, isEven x = true <-> isOdd x = false.
 Proof.
-intros x.
+intro x.
 induction x.
 - compute.
-  reflexivity.
-Abort.
+  split; reflexivity.
+- simpl.
+  apply not_iff in IHx.
+  rewrite not_false_iff_true in IHx.
+  rewrite not_true_iff_false in IHx.
+  destruct IHx as [IHx1 IHx2].
+  split.
+  + apply IHx2.
+  + apply IHx1.
+Qed.
 
+Theorem complete_even : forall x : nat, isEven x = true <-> even x.
+Proof.
+intro x.
+induction x.
+- split; intro.
+  + apply even0.
+  + compute. reflexivity.
+- simpl.
+  rewrite isEven_iff_not_isOdd in IHx.
+  split.
+  + apply not_iff in IHx.
+    rewrite not_false_iff_true in IHx.
+    rewrite even_iff_not_odd in IHx.
+    rewrite not_not in IHx.
+    intro.
+    apply evenS. 
+    apply IHx.
+    apply H.
+  + rewrite even_iff_not_odd in IHx.
+    apply not_iff in IHx.
+    rewrite not_false_iff_true in IHx.
+    rewrite not_not in IHx.
+    destruct IHx as [IHx1 IHx2].
+    rewrite odd_iff_next_even.
+    apply IHx2.
+Qed.
 
 (*
 During the demo I kept the automatic tactics hidden. They will try a bunch of different tactics to prove the goal for you.
@@ -434,4 +544,5 @@ Some of them are 'auto' and 'intuition'. Using this tactis could have made the p
 For more information about coq:
 - List of book and tutorials - https://coq.inria.fr/documentation
 - The documentation - https://coq.inria.fr/distrib/current/refman/
+- The standard library - https://coq.inria.fr/distrib/current/stdlib/
 *)

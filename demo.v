@@ -300,14 +300,46 @@ Proof.
 Abort.
 
 
-Theorem completeEven1 : forall x : nat, isEven x = true -> even x.
+(*
+  Now let's prove a difficult theorem.
+  We will prove that isEven returns true if and only if the number is of the even type.
+  
+  To prove that we will need to prove some additional lemmas.
+*)
+
+Lemma not_not: forall p: Prop, ~~p <-> p.
 Proof.
 Abort.
 
-Theorem completeEven2 : forall x : nat, even x -> isEven x = true.
+Lemma not_iff: forall p1 p2: Prop, (p1 <-> p2) -> (~p1 <-> ~p2).
 Proof.
 Abort.
 
+(* The predicates only dfines on of the directions. It is up to us to prove the other one.*)
+Lemma odd_iff_next_even : forall n, even (S n) <-> odd n.
+Proof.
+Abort.
+
+Lemma even_iff_next_odd : forall n, odd (S n) <-> even n.
+Proof.
+Abort.
+
+(* 
+Now for the 2 important lemmas:
+- The connection between even and odd.
+- The connection between isEven and isOdd.
+*)
+Lemma even_iff_not_odd : forall x: nat, even x <-> ~odd x.
+Proof.
+Abort.
+
+Lemma isEven_iff_not_isOdd : forall x: nat, isEven x = true <-> isOdd x = false.
+Proof.
+Abort.
+
+Theorem complete_even : forall x : nat, isEven x = true <-> even x.
+Proof.
+Abort.
 
 (*
 During the demo I kept the automatic tactics hidden. They will try a bunch of different tactics to prove the goal for you.
@@ -316,4 +348,5 @@ Some of them are 'auto' and 'intuition'. Using this tactis could have made the p
 For more information about coq:
 - List of book and tutorials - https://coq.inria.fr/documentation
 - The documentation - https://coq.inria.fr/distrib/current/refman/
+- The standard library - https://coq.inria.fr/distrib/current/stdlib/
 *)
