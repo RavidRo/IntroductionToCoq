@@ -21,10 +21,6 @@ Fail Check 5 && 6.
 (* Note that this is of type prop(Proposition). If we think that the proposition is indeed true than we need to prove it. *)
 Check 10 = 27.
 
-(* It doesnt ean there you cant write functions that check equality *)
-(* TODO: decide if you should include this or not - SearchPattern (nat -> nat -> bool). *)
-Compute Nat.eqb 1 1.
-
 Compute 20 * 2.
 Compute (false || true).
 
@@ -32,14 +28,6 @@ Compute (false || true).
 Definition x := 5.
 Check x.
 Compute x.
-
-(* Let allows you to create local varibles *)
-Compute let y := x in y+25.
-Fail Check y.
-Compute 
-  let num1 := 5 in
-    let num2:= 10 in
-      num1 + num2.
       
 (* Note that if is an expression and you can compute it's value *)
 Compute if true then x else 100.
@@ -205,6 +193,9 @@ Qed.
 Lemma lemma4 : ~False.
 Proof.
 intro.
+(* Introducing unfold *)
+unfold not.
+intro.
 (* Introducing contradiction *)
 contradiction.
 Qed.
@@ -257,6 +248,7 @@ destruct H as [H1 H2].
 apply H1.
 Qed.
 
+(* Understanding the multiple '->' syntax *)
 Lemma lemma11 : forall t1 t2 t3 : time, t1=t2 -> t2=t3 -> t1 = t2 /\ t2 = t3.
 Proof.
 intros.
@@ -308,7 +300,6 @@ apply lemma13.
 Qed.
 
 
-(* Understanding the multiple '->' syntax *)
 Lemma lemma15 : forall t1 t2 t3: time, t1=t2 -> t2=t3 -> t1 = t3.
 Proof.
 intros.
@@ -316,9 +307,19 @@ rewrite H.
 apply H0.
 Qed.
 
+Lemma lemma16 : (Four <> Two).
+Proof.
+discriminate.
+Qed.
+
+Lemma lemma17 : (Four = Two) -> False.
+Proof.
+intro.
+discriminate.
+Qed.
 
 (* A harder one *)
-Lemma lemma16 : forall h1 h2 : hour, eqHour h1 h2 = true -> h1 = h2.
+Lemma lemma18 : forall h1 h2 : hour, eqHour h1 h2 = true -> h1 = h2.
 Proof.
 (* 
   You can't do this, you get a flase assumption and its hard to see it:
@@ -352,16 +353,7 @@ all: compute; intro; (reflexivity || discriminate).
 Qed.
 
 
-Lemma lemma17 : (Four <> Two).
-Proof.
-discriminate.
-Qed.
 
-Lemma lemma18 : (Four = Two) -> False.
-Proof.
-intro.
-discriminate.
-Qed.
 
 
 (* 
@@ -427,17 +419,26 @@ split.
 (* Here we used a lemma from the standart library *)
 Check NNPP.
 - apply NNPP.
-(* Introducing unfold *)
 - unfold not.
   intro. 
+  intro.
   contradiction.
 Qed.
 
 Lemma not_iff: forall p1 p2: Prop, (p1 <-> p2) -> (~p1 <-> ~p2).
 Proof.
 intros.
+(* You can use rewrite and reflexivity on <-> *)
 rewrite H.
-split; intro H0; apply H0.
+reflexivity.
+Qed.
+
+(* Introducing inversion *)
+Lemma inversion : forall x y: nat, S x = S y -> x = y.
+Proof.
+intros x y H.
+inversion H.
+reflexivity.
 Qed.
 
 (* The predicates only dfines on of the directions. It is up to us to prove the other one.*)
@@ -446,7 +447,6 @@ Proof.
 intro.
 split.
 - intro.
-  (* Introducing inversion *)
   inversion H.
   apply H1.
 - apply evenS. 
@@ -502,6 +502,7 @@ induction x.
   split; reflexivity.
 - simpl.
   apply not_iff in IHx.
+  (* not_false_iff_true is a proof from the standard library! *)
   rewrite not_false_iff_true in IHx.
   rewrite not_true_iff_false in IHx.
   destruct IHx as [IHx1 IHx2].
@@ -516,25 +517,15 @@ intro x.
 induction x.
 - split; intro.
   + apply even0.
-  + compute. reflexivity.
+  + trivial.
 - simpl.
+  apply not_iff in IHx.
   rewrite isEven_iff_not_isOdd in IHx.
-  split.
-  + apply not_iff in IHx.
-    rewrite not_false_iff_true in IHx.
-    rewrite even_iff_not_odd in IHx.
-    rewrite not_not in IHx.
-    intro.
-    apply evenS. 
-    apply IHx.
-    apply H.
-  + rewrite even_iff_not_odd in IHx.
-    apply not_iff in IHx.
-    rewrite not_false_iff_true in IHx.
-    rewrite not_not in IHx.
-    destruct IHx as [IHx1 IHx2].
-    rewrite odd_iff_next_even.
-    apply IHx2.
+  rewrite not_false_iff_true in IHx.
+  rewrite even_iff_not_odd in IHx.
+  rewrite not_not in IHx.
+  rewrite odd_iff_next_even.
+  apply IHx.
 Qed.
 
 (*

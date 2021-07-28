@@ -28,14 +28,6 @@ Compute (false || true).
 Definition x := 5.
 Check x.
 Compute x.
-
-(* Let allows you to create local varibles *)
-Compute let y := x in y+25.
-Fail Check y.
-Compute 
-  let num1 := 5 in
-    let num2:= 10 in
-      num1 + num2.
       
 (* Note that if is an expression and you can compute it's value *)
 Compute if true then x else 100.
@@ -220,6 +212,7 @@ Lemma lemma10 : forall t1 t2 t3 : time, t1 = t2 /\ t2 = t3 -> t1 = t2.
 Proof.
 Abort.
 
+(* Understanding the multiple '->' syntax *)
 Lemma lemma11 : forall t1 t2 t3 : time, t1=t2 -> t2=t3 -> t1 = t2 /\ t2 = t3.
 Proof.
 Abort.
@@ -237,23 +230,20 @@ Proof.
 Abort.
 
 
-(* Understanding the multiple '->' syntax *)
 Lemma lemma15 : forall t1 t2 t3: time, t1=t2 -> t2=t3 -> t1 = t3.
 Proof.
 Abort.
 
+Lemma lemma16 : (Four <> Two).
+Proof.
+Abort.
+
+Lemma lemma17 : (Four = Two) -> False.
+Proof.
+Abort.
 
 (* A harder one *)
-Lemma lemma16 : forall h1 h2 : hour, eqHour h1 h2 = true -> h1 = h2.
-Proof.
-Abort.
-
-
-Lemma lemma17 : (Four <> Two).
-Proof.
-Abort.
-
-Lemma lemma18 : (Four = Two) -> False.
+Lemma lemma18 : forall h1 h2 : hour, eqHour h1 h2 = true -> h1 = h2.
 Proof.
 Abort.
 
@@ -312,6 +302,11 @@ Proof.
 Abort.
 
 Lemma not_iff: forall p1 p2: Prop, (p1 <-> p2) -> (~p1 <-> ~p2).
+Proof.
+Abort.
+
+(* Introducing inversion *)
+Lemma inversion : forall x y: nat, S x = S y -> x = y.
 Proof.
 Abort.
 
