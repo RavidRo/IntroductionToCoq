@@ -1,4 +1,4 @@
-From Coq Require Import Arith Bool.
+From Coq Require Import Arith Bool Classical_Prop.
 
 (* Coq is a functional strongly typed programming language *)
 
