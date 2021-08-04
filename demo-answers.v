@@ -29,10 +29,6 @@ Definition x := 5.
 Check x.
 Compute x.
       
-(* Note that if is an expression and you can compute it's value *)
-Compute if true then x else 100.
-
-
 (* This is how you declare inductive types *)
 Inductive hour :=
     One : hour
@@ -155,7 +151,7 @@ Qed.
 Lemma lemma2 : x=2 -> x=2.
 Proof.
 (* You can see you context (variables and hypotheses) at the top right *)
-intros H.
+intro H.
 apply H.
 Qed.
 
@@ -177,7 +173,7 @@ Check lemma1.
        |  False        |       N/A        |   contradiction    |
        | forall x, P x |      intros      |      apply         |
        | exists x, P x |     exists t     |     destruct       |
-       | t = u         | reflexivity/ring |rewrite/discriminate|
+       | t = u         |    reflexivity   |rewrite/discriminate|
        | t <> u        |   discriminate   |   contradiction    |
        
   Good cheat sheet for basic tactics :
@@ -192,7 +188,6 @@ Qed.
 
 Lemma lemma4 : ~False.
 Proof.
-intro.
 (* Introducing unfold *)
 unfold not.
 intro.
@@ -307,6 +302,7 @@ rewrite H.
 apply H0.
 Qed.
 
+(* Introducing discriminate *)
 Lemma lemma16 : (Four <> Two).
 Proof.
 discriminate.
@@ -422,6 +418,7 @@ Check NNPP.
 - unfold not.
   intro. 
   intro.
+  (* Remember that p -> false is equal to ~p *)
   contradiction.
 Qed.
 
@@ -441,7 +438,7 @@ inversion H.
 reflexivity.
 Qed.
 
-(* The predicates only dfines on of the directions. It is up to us to prove the other one.*)
+(* The predicates only assumes one of the directions. It is up to us to prove the other one.*)
 Lemma odd_iff_next_even : forall n, even (S n) <-> odd n.
 Proof.
 intro.
@@ -480,18 +477,12 @@ induction x.
     inversion H_odd0.
   + intro. 
     apply even0.
-- split.
-  + intro.
-    inversion H.
-    intro.
-    inversion H2.
-    apply IHx in H4.
-    contradiction.
-  + rewrite odd_iff_next_even.
-    rewrite even_iff_next_odd.
-    apply not_iff in IHx.
-    rewrite not_not in IHx.
-    apply IHx.
+- rewrite odd_iff_next_even.
+  rewrite even_iff_next_odd.
+  apply not_iff in IHx.
+  rewrite not_not in IHx.
+  Fail apply IHx.
+  split; apply IHx.
 Qed.
 
 Lemma isEven_iff_not_isOdd : forall x: nat, isEven x = true <-> isOdd x = false.
@@ -505,10 +496,7 @@ induction x.
   (* not_false_iff_true is a proof from the standard library! *)
   rewrite not_false_iff_true in IHx.
   rewrite not_true_iff_false in IHx.
-  destruct IHx as [IHx1 IHx2].
-  split.
-  + apply IHx2.
-  + apply IHx1.
+  split; apply IHx.
 Qed.
 
 Theorem complete_even : forall x : nat, isEven x = true <-> even x.
@@ -536,4 +524,5 @@ For more information about coq:
 - List of book and tutorials - https://coq.inria.fr/documentation
 - The documentation - https://coq.inria.fr/distrib/current/refman/
 - The standard library - https://coq.inria.fr/distrib/current/stdlib/
+- Five Stages Of Accepting Constructive Mathematics - https://www.ams.org/journals/bull/2017-54-03/S0273-0979-2016-01556-4/S0273-0979-2016-01556-4.pdf
 *)

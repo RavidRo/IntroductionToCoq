@@ -28,10 +28,6 @@ Compute (false || true).
 Definition x := 5.
 Check x.
 Compute x.
-      
-(* Note that if is an expression and you can compute it's value *)
-Compute if true then x else 100.
-
 
 (* This is how you declare inductive types *)
 Inductive hour :=
@@ -173,7 +169,7 @@ Check lemma1.
        |  False        |       N/A        |   contradiction    |
        | forall x, P x |      intros      |      apply         |
        | exists x, P x |     exists t     |     destruct       |
-       | t = u         | reflexivity/ring |rewrite/discriminate|
+       | t = u         |    reflexivity   |rewrite/discriminate|
        | t <> u        |   discriminate   |   contradiction    |
        
   Good cheat sheet for basic tactics :
@@ -234,6 +230,7 @@ Lemma lemma15 : forall t1 t2 t3: time, t1=t2 -> t2=t3 -> t1 = t3.
 Proof.
 Abort.
 
+(* Introducing discriminate *)
 Lemma lemma16 : (Four <> Two).
 Proof.
 Abort.
@@ -310,7 +307,7 @@ Lemma inversion : forall x y: nat, S x = S y -> x = y.
 Proof.
 Abort.
 
-(* The predicates only dfines on of the directions. It is up to us to prove the other one.*)
+(* The predicates only assumes one of the directions. It is up to us to prove the other one.*)
 Lemma odd_iff_next_even : forall n, even (S n) <-> odd n.
 Proof.
 Abort.
@@ -344,4 +341,5 @@ For more information about coq:
 - List of book and tutorials - https://coq.inria.fr/documentation
 - The documentation - https://coq.inria.fr/distrib/current/refman/
 - The standard library - https://coq.inria.fr/distrib/current/stdlib/
+- Five Stages Of Accepting Constructive Mathematics - https://www.ams.org/journals/bull/2017-54-03/S0273-0979-2016-01556-4/S0273-0979-2016-01556-4.pdf
 *)
