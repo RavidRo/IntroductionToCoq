@@ -1,4 +1,4 @@
-From Coq Require Import Arith Bool Classical_Prop.
+From Coq Require Import Arith Bool.
 
 (* Coq is a functional strongly typed programming language *)
 
@@ -408,18 +408,14 @@ Qed.
   To prove that we will need to prove some additional lemmas.
 *)
 
-Lemma not_not: forall p: Prop, ~~p <-> p.
+Lemma not_not: forall p: Prop, p -> ~~p.
 Proof.
 intro.
-split.
-(* Here we used a lemma from the standart library *)
-Check NNPP.
-- apply NNPP.
-- unfold not.
-  intro. 
-  intro.
-  (* Remember that p -> false is equal to ~p *)
-  contradiction.
+unfold not.
+intro. 
+intro.
+(* Remember that p -> false is equal to ~p *)
+contradiction.
 Qed.
 
 Lemma not_iff: forall p1 p2: Prop, (p1 <-> p2) -> (~p1 <-> ~p2).
@@ -429,6 +425,28 @@ intros.
 rewrite H.
 reflexivity.
 Qed.
+
+
+(*
+  ( P ->  Q)  ->  (~Q -> ~P)    -   PROVED
+  ( P -> ~Q)  ->  ( Q -> ~P)    -   PROVED
+  (~P ->  Q)  ->  (~Q ->  P)    -   NEEDED
+*)
+
+Lemma test: forall p1 p2: Prop, (p1 <-> ~p2) -> (~p1 <-> p2).
+Proof.
+intros.
+split.
+- destruct H.
+  intro.
+  admit.
+- destruct H.
+  intro.
+  intro.
+  apply H in H2.
+  contradiction.
+Admitted.
+
 
 (* Introducing inversion *)
 Lemma inversion : forall x y: nat, S x = S y -> x = y.
@@ -479,10 +497,16 @@ induction x.
     apply even0.
 - rewrite odd_iff_next_even.
   rewrite even_iff_next_odd.
-  apply not_iff in IHx.
-  rewrite not_not in IHx.
+  apply test in IHx.
   Fail apply IHx.
   split; apply IHx.
+Qed.
+
+Lemma not_even_iff_odd : forall x: nat, ~even x <-> odd x.
+Proof.
+intros.
+apply test.
+apply even_iff_not_odd.
 Qed.
 
 Lemma isEven_iff_not_isOdd : forall x: nat, isEven x = true <-> isOdd x = false.
@@ -499,6 +523,20 @@ induction x.
   split; apply IHx.
 Qed.
 
+Lemma not_isEven_iff_isOdd : forall x: nat, isEven x = false <-> isOdd x = true.
+Proof.
+intro x.
+induction x.
+- compute.
+  split; discriminate.
+- simpl.
+  apply not_iff in IHx.
+  (* not_false_iff_true is a proof from the standard library! *)
+  rewrite not_false_iff_true in IHx.
+  rewrite not_true_iff_false in IHx.
+  split; apply IHx.
+Qed.
+
 Theorem complete_even : forall x : nat, isEven x = true <-> even x.
 Proof.
 intro x.
@@ -507,12 +545,11 @@ induction x.
   + apply even0.
   + trivial.
 - simpl.
-  apply not_iff in IHx.
-  rewrite isEven_iff_not_isOdd in IHx.
-  rewrite not_false_iff_true in IHx.
-  rewrite even_iff_not_odd in IHx.
-  rewrite not_not in IHx.
   rewrite odd_iff_next_even.
+  apply not_iff in IHx.
+  rewrite not_even_iff_odd in IHx.
+  rewrite not_true_iff_false in IHx.
+  rewrite not_isEven_iff_isOdd in IHx.
   apply IHx.
 Qed.
 

@@ -1,4 +1,4 @@
-From Coq Require Import Arith Bool Classical_Prop.
+From Coq Require Import Arith Bool.
 
 (* Coq is a functional strongly typed programming language *)
 
@@ -294,7 +294,11 @@ Abort.
   To prove that we will need to prove some additional lemmas.
 *)
 
-Lemma not_not: forall p: Prop, ~~p <-> p.
+Lemma not_not: forall p: Prop, p -> ~~p.
+Proof.
+Abort.
+
+Lemma test: forall p1 p2: Prop, (p1 <-> ~p2) -> (~p1 <-> p2).
 Proof.
 Abort.
 
@@ -322,6 +326,10 @@ Now for the 2 important lemmas:
 - The connection between isEven and isOdd.
 *)
 Lemma even_iff_not_odd : forall x: nat, even x <-> ~odd x.
+Proof.
+Abort.
+
+Lemma not_even_iff_odd : forall x: nat, ~even x <-> odd x.
 Proof.
 Abort.
 
